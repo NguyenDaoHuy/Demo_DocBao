@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:orientation="vertical"
+    android:background="@drawable/custom_danh_sach_bao"
+    android:layout_margin="10dp">
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="25dp"
+          android:text="Tiêu đề"
+          android:textSize="20dp"
+          android:textColor="@color/black"
+          android:layout_margin="10dp"
+          android:maxLines="1"
+          android:ellipsize="end"
+          android:id="@+id/txtTieuDe"/>
+      <TextView
+          android:id="@+id/txtNoiDung"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:maxLines="3"
+          android:ellipsize="end"
+          android:textSize="12dp"
+          android:textColor="#4A4A4A"
+          android:layout_marginLeft="10dp"
+          android:layout_marginRight="10dp"/>
+</LinearLayout>
