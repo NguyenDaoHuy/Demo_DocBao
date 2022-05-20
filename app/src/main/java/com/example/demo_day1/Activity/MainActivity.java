@@ -6,20 +6,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.demo_day1.Adapter.AdapterBao;
 import com.example.demo_day1.Model.Bao;
-import com.example.demo_day1.MyAsyncTask;
 import com.example.demo_day1.R;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.BufferedReader;
@@ -27,8 +25,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private TextView txtLink;
@@ -88,18 +84,10 @@ public class MainActivity extends AppCompatActivity {
     private String docNoiDung_Tu_URL(String theUrl){
         StringBuilder content = new StringBuilder();
         try    {
-            // create a url object
             URL url = new URL(theUrl);
-
-            // create a urlconnection object
             URLConnection urlConnection = url.openConnection();
-
-            // wrap the urlconnection in a bufferedreader
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-
             String line;
-
-            // read from the urlconnection via the bufferedreader
             while ((line = bufferedReader.readLine()) != null){
                 content.append(line + "\n");
             }
@@ -123,30 +111,39 @@ public class MainActivity extends AppCompatActivity {
             XMLDOMParser parser = new XMLDOMParser();
             Document doc = parser.getDocument(s);
             NodeList nodeList = doc.getElementsByTagName("item");
-            NodeList nodeListDecription = doc.getElementsByTagName("description");
             String title = "";
             String description = "";
             baoArrayList = new ArrayList<>();
+            Bao bao = new Bao();
             for(int i = 0 ; i < nodeList.getLength() ; i++){
-                String cdata = nodeListDecription.item(i+1).getTextContent();
-                Pattern p = Pattern.compile("<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>");
-                Matcher matcher = p.matcher(cdata);
-                if(matcher.find()){
-                    description = matcher.group(1);
-                }
+            //    String cdata = nodeListDecription.item(i+1).getTextContent();
+            //    Pattern p = Pattern.compile("<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>");
+            //    Matcher matcher = p.matcher(cdata);
+            //    if(matcher.find()){
+            //        description = matcher.group(1);
+            //   }
                 Element e = (Element) nodeList.item(i);
-                title = parser.getValue(e,"title");
-            //    description = parser.getValue(e,"description").toString();
-                baoArrayList.add(new Bao(title,description));
+                title = getTagValue("title",e);
+                description = getTagValue("description",e);
+                String noHTMLString = description.replaceAll("\\<.*?\\>", "");
+                baoArrayList.add(new Bao(title,noHTMLString));
             }
-            for (Bao b : baoArrayList)
-            {
+            for (Bao b: baoArrayList) {
                 System.out.println(b);
             }
             System.out.println("Số phần tử =========================" + baoArrayList.size());
             adapterBao = new AdapterBao(MainActivity.this,baoArrayList);
             lvBao.setAdapter(adapterBao);
         }
+    }
+    private String getTagValue(String sTag, Element eElement) {
+        NodeList nlList = eElement.getElementsByTagName(sTag).item(0)
+                .getChildNodes();
+
+        Node nValue = (Node) nlList.item(0);
+
+        return nValue.getNodeValue();
+
     }
 
 }
