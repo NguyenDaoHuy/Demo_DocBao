@@ -52,9 +52,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         baoArrayList = new ArrayList<>();
-   //     baoArrayList.add(new Bao("Chuột rút khi chơi thể thao","Khi đang chơi thể thao bị chuột rút, cần lập tức dừng vận động và nghỉ ngơi, thả chùng chi đang co rút để thư giãn bắp thịt, sau đó xoa bóp, có thể chườm nóng."));
-   //     baoArrayList.add(new Bao("Bệnh đậu mùa khỉ trỗi dậy ở châu Âu","Bệnh đậu mùa khỉ xuất hiện ở nhiều quốc gia châu Âu, các chuyên gia phỏng đoán nguyên nhân là do các nước nới hạn chế di chuyển giai đoạn hậu Covid."));
-   //     baoArrayList.add(new Bao("Vì sao bệnh viện dùng nhiều máy mượn để xét nghiệm bệnh nhân?","Các bệnh viện cho rằng sử dụng máy mượn, máy đặt của các đơn vị trúng thầu vật tư hóa chất mang lại nhiều lợi ích trong xét nghiệm, khám chữa bệnh, tránh lãng phí ngân sách."));
 
         runOnUiThread(new Runnable() {
             @Override
@@ -62,12 +59,6 @@ public class MainActivity extends AppCompatActivity {
                  new ReadXML().execute("https://vnexpress.net/rss/suc-khoe.rss");
             }
         });
-       // MyAsyncTask getDuLieu = new MyAsyncTask(link,lvBao,MainActivity.this);
-      //  getDuLieu.execute();
-    }
-
-    private void getDuLieu() {
-
     }
 
     private void goToURL(String s) {
@@ -139,9 +130,7 @@ public class MainActivity extends AppCompatActivity {
     private String getTagValue(String sTag, Element eElement) {
         NodeList nlList = eElement.getElementsByTagName(sTag).item(0)
                 .getChildNodes();
-
         Node nValue = (Node) nlList.item(0);
-
         return nValue.getNodeValue();
 
     }
