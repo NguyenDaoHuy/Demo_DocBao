@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.demo_day1.Adapter.AdapterBao;
 import com.example.demo_day1.Model.Bao;
+import com.example.demo_day1.MyAsyncTask;
 import com.example.demo_day1.R;
 
 import org.w3c.dom.Document;
@@ -25,6 +27,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     private TextView txtLink;
@@ -32,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView lvBao;
     private AdapterBao adapterBao;
     private ArrayList<Bao> baoArrayList;
+    private String link = "https://vnexpress.net/rss/suc-khoe.rss";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
                  new ReadXML().execute("https://vnexpress.net/rss/suc-khoe.rss");
             }
         });
+       // MyAsyncTask getDuLieu = new MyAsyncTask(link,lvBao,MainActivity.this);
+      //  getDuLieu.execute();
     }
 
     private void getDuLieu() {
@@ -119,19 +126,27 @@ public class MainActivity extends AppCompatActivity {
             NodeList nodeListDecription = doc.getElementsByTagName("description");
             String title = "";
             String description = "";
-            String kq = "";
             baoArrayList = new ArrayList<>();
             for(int i = 0 ; i < nodeList.getLength() ; i++){
                 String cdata = nodeListDecription.item(i+1).getTextContent();
-
+                Pattern p = Pattern.compile("<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>");
+                Matcher matcher = p.matcher(cdata);
+                if(matcher.find()){
+                    description = matcher.group(1);
+                }
                 Element e = (Element) nodeList.item(i);
                 title = parser.getValue(e,"title");
-                description = parser.getValue(e,"pubDate").toString();
+            //    description = parser.getValue(e,"description").toString();
                 baoArrayList.add(new Bao(title,description));
+            }
+            for (Bao b : baoArrayList)
+            {
+                System.out.println(b);
             }
             System.out.println("Số phần tử =========================" + baoArrayList.size());
             adapterBao = new AdapterBao(MainActivity.this,baoArrayList);
             lvBao.setAdapter(adapterBao);
         }
     }
+
 }
