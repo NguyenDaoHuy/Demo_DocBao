@@ -15,7 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class XMLDOMParser {
     public Document getDocument(String xml)
     {
-        Document document = null;
+        Document document;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try{
             DocumentBuilder db = factory.newDocumentBuilder();
@@ -23,16 +23,8 @@ public class XMLDOMParser {
             is.setCharacterStream(new StringReader(xml));
             is.setEncoding("UTF-8");
             document = db.parse(is);
-        }catch(ParserConfigurationException e)
+        }catch(ParserConfigurationException | SAXException | IOException e)
         {
-            Log.e("Error: ", e.getMessage(), e);
-            return null;
-        }
-        catch (SAXException e) {
-            Log.e("Error: ", e.getMessage(), e);
-            return null;
-        }
-        catch(IOException e){
             Log.e("Error: ", e.getMessage(), e);
             return null;
         }
@@ -43,7 +35,7 @@ public class XMLDOMParser {
         NodeList nodes = item.getElementsByTagName(name);
         return this.getTextNodeValue(nodes.item(0));
     }
-    private final String getTextNodeValue(Node elem) {
+    private String getTextNodeValue(Node elem) {
         Node child;
         if( elem != null){
             if (elem.hasChildNodes()){

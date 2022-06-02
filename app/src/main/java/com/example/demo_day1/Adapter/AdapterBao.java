@@ -1,37 +1,29 @@
 package com.example.demo_day1.Adapter;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Parcelable;
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-import com.example.demo_day1.Activity.DocBaoActivity;
-import com.example.demo_day1.Activity.MainActivity;
 import com.example.demo_day1.Model.Bao;
 import com.example.demo_day1.R;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 public class AdapterBao extends BaseAdapter {
-    ArrayList<Bao> baoList;
-    MainActivity context;
-    public AdapterBao(MainActivity context,ArrayList<Bao> baoList){
-        this.context = context;
-        this.baoList = baoList;
+    IRSS irss;
+
+    public AdapterBao(IRSS irss) {
+        this.irss = irss;
     }
+
     @Override
     public int getCount() {
-        return baoList.size();
+        return irss.getCount();
     }
 
     @Override
     public Object getItem(int position) {
-        return baoList.get(position);
+        return irss.getData(position);
     }
 
     @Override
@@ -42,20 +34,18 @@ public class AdapterBao extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater =LayoutInflater.from(parent.getContext());
-        View view = layoutInflater.inflate(R.layout.item_danh_sach_bao,parent,false);
+        @SuppressLint("ViewHolder") View view = layoutInflater.inflate(R.layout.item_danh_sach_bao,parent,false);
         TextView txtTieuDe = view.findViewById(R.id.txtTieuDe);
         TextView txtNoiDung = view.findViewById(R.id.txtNoiDung);
-        Bao bao = baoList.get(position);
+        Bao bao = irss.getData(position);
         txtTieuDe.setText(bao.getTitle());
         txtNoiDung.setText(bao.getDescription());
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, DocBaoActivity.class);
-                intent.putExtra("thongtin", baoList.get(position));
-                context.startActivity(intent);
-            }
-        });
+        view.setOnClickListener(v -> irss.setOnClick(position));
         return view;
+    }
+    public interface IRSS {
+        int getCount();
+        Bao getData (int possition);
+        void setOnClick(int possition);
     }
 }

@@ -1,15 +1,15 @@
 package com.example.demo_day1.Activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.demo_day1.Adapter.AdapterBao;
 import com.example.demo_day1.Model.Bao;
@@ -26,47 +26,36 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterBao.IRSS {
     private TextView txtLink;
     private ImageView logo;
     private ListView lvBao;
     private AdapterBao adapterBao;
     private ArrayList<Bao> baoArrayList;
-    private String link = "https://vnexpress.net/rss/suc-khoe.rss";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        anhXa();
-        txtLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                 goToURL("https://vnexpress.net/suc-khoe");
-            }
-        });
-        logo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToURL("https://vnexpress.net/suc-khoe");
-            }
-        });
+        findView();
+        txtLink.setOnClickListener(v -> goToURL());
+        logo.setOnClickListener(v -> goToURL());
         baoArrayList = new ArrayList<>();
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                 new ReadXML().execute("https://vnexpress.net/rss/suc-khoe.rss");
-            }
+        runOnUiThread(() -> {
+             new ReadXML().execute("https://vnexpress.net/rss/suc-khoe.rss");
+             baoArrayList = new ArrayList<>();
         });
+        adapterBao = new AdapterBao(this);
+        lvBao.setAdapter(adapterBao);
     }
 
-    private void goToURL(String s) {
-        Uri uri =Uri.parse(s);
+    private void goToURL() {
+        Uri uri =Uri.parse("https://vnexpress.net/suc-khoe");
         startActivity(new Intent(Intent.ACTION_VIEW,uri));
     }
 
-    private void anhXa() {
+    private void findView() {
         txtLink = findViewById(R.id.txtLink);
         logo = findViewById(R.id.logo);
         lvBao = findViewById(R.id.lvBao);
@@ -80,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             String line;
             while ((line = bufferedReader.readLine()) != null){
-                content.append(line + "\n");
+                content.append(line).append("\n");
             }
             bufferedReader.close();
         }
@@ -90,11 +79,33 @@ public class MainActivity extends AppCompatActivity {
         return content.toString();
     }
 
+    @Override
+    public int getCount() {
+        if(baoArrayList == null){
+             return 0;
+        } else {
+            baoArrayList.size();
+        }
+        return baoArrayList.size();
+    }
+
+    @Override
+    public Bao getData(int possition) {
+        return baoArrayList.get(possition);
+    }
+
+    @Override
+    public void setOnClick(int possition) {
+        Intent intent = new Intent(this, DocBaoActivity.class);
+        intent.putExtra("thongtin", baoArrayList.get(possition));
+        startActivity(intent);
+    }
+
+    @SuppressLint("StaticFieldLeak")
     private class ReadXML extends AsyncTask<String, Integer, String>{
         @Override
         protected String doInBackground(String... strings) {
-            String kq = docNoiDung_Tu_URL(strings[0]);
-            return kq;
+            return docNoiDung_Tu_URL(strings[0]);
         }
 
         @Override
@@ -102,17 +113,10 @@ public class MainActivity extends AppCompatActivity {
             XMLDOMParser parser = new XMLDOMParser();
             Document doc = parser.getDocument(s);
             NodeList nodeList = doc.getElementsByTagName("item");
-            String title = "";
-            String description = "";
+            String title;
+            String description;
             baoArrayList = new ArrayList<>();
-            Bao bao = new Bao();
             for(int i = 0 ; i < nodeList.getLength() ; i++){
-            //    String cdata = nodeListDecription.item(i+1).getTextContent();
-            //    Pattern p = Pattern.compile("<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>");
-            //    Matcher matcher = p.matcher(cdata);
-            //    if(matcher.find()){
-            //        description = matcher.group(1);
-            //   }
                 Element e = (Element) nodeList.item(i);
                 title = getTagValue("title",e);
                 description = getTagValue("description",e);
@@ -122,15 +126,14 @@ public class MainActivity extends AppCompatActivity {
             for (Bao b: baoArrayList) {
                 System.out.println(b);
             }
-            System.out.println("Số phần tử =========================" + baoArrayList.size());
-            adapterBao = new AdapterBao(MainActivity.this,baoArrayList);
+            //
             lvBao.setAdapter(adapterBao);
         }
     }
     private String getTagValue(String sTag, Element eElement) {
         NodeList nlList = eElement.getElementsByTagName(sTag).item(0)
                 .getChildNodes();
-        Node nValue = (Node) nlList.item(0);
+        Node nValue = nlList.item(0);
         return nValue.getNodeValue();
 
     }
